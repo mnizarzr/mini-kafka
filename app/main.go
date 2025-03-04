@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
@@ -23,5 +24,10 @@ func main() {
 	}
 	buff := make([]byte, 1024)
 	conn.Read(buff)
-	conn.Write([]byte{0,0,0,0,0,0,0,7})
+	fmt.Printf("Received message %v (%d)", buff[8:12], int32(binary.BigEndian.Uint32(buff[8:12])))
+	resp := make([]byte, 8)
+	copy(resp, []byte{0,0,0,0})
+	copy(resp[4:], buff[8:12])
+	conn.Write(resp)
+	conn.Close()
 }
